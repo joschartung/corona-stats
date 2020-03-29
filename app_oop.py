@@ -6,32 +6,44 @@ import data
 class Win1:
     def __init__(self,master):
         self.master = master
-        self.master.geometry("500x500")
+        self.master.geometry("300x300")
         self.frame = tk.Frame(self.master)
         # add code for dropdown below
         self.tkvar = tk.StringVar(self.master)
-        self.choices = data.confirmed_dict.keys()
+        self.choices = [k for k in data.confirmed_dict.keys()]
+        self.choices.insert(0, "None")
         self.tkvar.set("US")
         self.popup_menu = tk.OptionMenu(self.master, self.tkvar, *self.choices)
-        tk.Label(self.master, text="Pick a Country").pack(side=tk.LEFT)
-        self.popup_menu.pack(side=tk.LEFT)
+        tk.Label(self.master, text="Pick a Country").pack(side=tk.TOP)
+        self.popup_menu.pack(side=tk.TOP)
         self.tkvar.trace('w',self.change_dropdown)
         self.button = tk.Button(self.frame, text="Click here to view data", command = lambda: self.new_window("2",Win2))
+        self.quitb = tk.Button(self.frame, text="Click here to quit", command = self.close_window).pack(side=tk.BOTTOM)
         self.button.pack(side=tk.RIGHT)
+        self.svar = tk.StringVar(self.master)
+        tk.Label(self.master,text="Enter a Country").pack(side=tk.TOP)
+        self.var = tk.Entry(self.master,textvariable=self.svar).pack(side=tk.TOP)
         self.frame.pack()
     def new_window(self, number, _class):
         self.new = tk.Toplevel(self.master)
-        _class(self.new, number, self.tkvar)
+        if self.tkvar.get() == "None":
+            if self.svar.get().capitalize() in self.choices:
+                _class(self.new, number,self.svar)
+            else:
+                tk.Label(self.master, text="please enter a valid country", fg='red').pack(side=tk.LEFT)
+        else:
+            _class(self.new, number, self.tkvar)
     def change_dropdown(self, *args):
         print(self.tkvar.get())
+    def close_window(self):
+        self.master.destroy()
+        exit()
 class Win2:
     def __init__(self, master, number, country):
         self.master = master
-        self.master.geometry("500x500")
+        self.master.geometry("600x600")
         self.frame = tk.Frame(self.master)
         c = str(country.get())
-        self.quit = tk.Button(self.frame, text= "Quit this window", command = self.close_window)
-        self.quit.pack(side=tk.LEFT)
 
         conf = data.confirmed_dict
         dead = data.death_dict
@@ -41,7 +53,9 @@ class Win2:
         y_conf = conf[c]
         y_dead = dead[c]
         y_rec = rec[c]
-
+        cur_conf = y_conf[-1]
+        cur_dead = y_dead[-1]
+        cur_rec = y_rec[-1]
         fig, axs = plt.subplots(3,1,constrained_layout=True)
         fig.suptitle("Covid 19 data: " +c)
         axs[0].plot(x, y_conf, 'o', c='y')
@@ -57,6 +71,11 @@ class Win2:
         axs[2].set_xlabel('days since 1/22/2020')
         axs[2].set_ylabel('# of recoveries')
         self.sc = FigureCanvasTkAgg(fig, self.frame)
+
+        self.retext = tk.Label(self.master, text="Recoveries: {}".format(cur_rec)).pack(side=tk.BOTTOM)
+        self.detext = tk.Label(self.master, text="Deaths: {}".format(cur_dead)).pack(side=tk.BOTTOM)
+        self.conftext = tk.Label(self.master, text="Confirmed Cases: {}".format(cur_conf)).pack(side=tk.BOTTOM)
+        self.quit = tk.Button(self.frame, text= "Quit this window", command = self.close_window).pack(side=tk.BOTTOM)
         self.sc.get_tk_widget().pack(side=tk.LEFT,fill=tk.BOTH)
         self.frame.pack()
     def close_window(self):
@@ -64,5 +83,6 @@ class Win2:
 
 root = tk.Tk()
 root.title("Covid 19 Tracker")
+root.iconbitmap("img/coronavirus.ico")
 app = Win1(root)
 root.mainloop()
