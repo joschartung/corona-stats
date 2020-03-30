@@ -1,8 +1,8 @@
 import requests
-
+import time
 link = "https://data.humdata.org/dataset/novel-coronavirus-2019-ncov-cases"
 
-def get_recent():
+def main():
     confirmed = "https://data.humdata.org/hxlproxy/api/data-preview.csv?url=https%3A%2F%2Fraw.githubusercontent.com%2FCSSEGISandData%2FCOVID-19%2Fmaster%2Fcsse_covid_19_data%2Fcsse_covid_19_time_series%2Ftime_series_covid19_confirmed_global.csv&filename=time_series_covid19_confirmed_global.csv"
     rc = requests.get(confirmed)
     with open("data/time_series_covid19_confirmed_global.csv",'wb') as f:
@@ -24,4 +24,4 @@ def get_recent():
     f.close()
 
 if __name__ == "__main__":
-    get_recent()
+    main()
