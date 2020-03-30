@@ -2,7 +2,7 @@ import tkinter as tk
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import data
-import regression
+import exp_regression
 
 class Win1:
     def __init__(self,master):
@@ -54,34 +54,31 @@ class Win2:
         y_conf = conf[c]
         y_dead = dead[c]
         y_rec = rec[c]
-        conf_pred = regression.nonlinear_regression(c, "confirmed")
-        death_pred = regression.nonlinear_regression(c, "dead")
-        rec_pred = regression.nonlinear_regression(c, "recovered")
-        y_conf_pred = conf_pred["y_poly_pred"]
-        y_conf_r2 = conf_pred["r2"]
-        y_dead_pred = death_pred["y_poly_pred"]
-        y_dead_r2 = death_pred["r2"]
-        y_rec_pred = rec_pred["y_poly_pred"]
-        y_rec_r2 = rec_pred["r2"]
+        conf_pred = exp_regression.exp_reg(c, "confirmed")
+        death_pred = exp_regression.exp_reg(c, "dead")
+        rec_pred = exp_regression.exp_reg(c, "recovered")
+        y_conf_pred = conf_pred["y predicted"]
+        y_death_pred = death_pred["y predicted"]
+        y_rec_pred = rec_pred["y predicted"]
         cur_conf = y_conf[-1]
         cur_dead = y_dead[-1]
         cur_rec = y_rec[-1]
         fig, axs = plt.subplots(3,1,constrained_layout=True)
         fig.suptitle("Covid 19 Data: " +c)
         axs[0].plot(x, y_conf, 'o', c='y')
-        axs[0].plot(x, y_conf_pred, c="g", label="r^2: {}".format(y_conf_r2))
+        axs[0].plot(x, y_conf_pred, c='k', label=conf_pred["form"])
         axs[0].set_title('confirmed vs. time')
         axs[0].set_xlabel("days since 1/22/2020")
         axs[0].set_ylabel("# of confirmed cases")
         axs[0].legend(loc="upper left")
         axs[1].plot(x, y_dead, 'o',c='r')
-        axs[1].plot(x, y_dead_pred, c='g', label="r^2: {}".format(y_dead_r2))
+        axs[1].plot(x,y_death_pred, c='k', label=death_pred['form'])
         axs[1].set_title('deaths vs. time')
         axs[1].set_xlabel('days since 1/22/2020')
         axs[1].set_ylabel('# of deaths')
         axs[1].legend(loc="upper left")
         axs[2].plot(x, y_rec, 'o', c='g')
-        axs[2].plot(x, y_rec_pred, c='y', label="r^2: {}".format(y_rec_r2))
+        axs[2].plot(x,y_rec_pred,c='k', label=rec_pred["form"])
         axs[2].set_title('recovered vs. time')
         axs[2].set_xlabel('days since 1/22/2020')
         axs[2].set_ylabel('# of recoveries')
