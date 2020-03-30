@@ -32,6 +32,7 @@ def fit(x,y, log_y):
 def score(y, y_pred):
     r2 = r2_score(y, y_pred)
     return r2
+
 def get_form(f):
     form = str(np.exp(f[1])) + "*" + str(np.exp(f[0])) + "x"
     return form
