@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import data as d
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures
@@ -94,7 +93,7 @@ class Exp:
         plt.show()
     def predict(self, val):
         """
-        predicts for any given value 
+        predicts for any given value
         """
         return self.func(val)
 

@@ -1,7 +1,7 @@
 import tkinter as tk
 from matplotlib import pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import data
+import dataset
 import regression
 import scrape
 
@@ -13,8 +13,9 @@ class Win1:
         self.master.geometry("300x300")
         self.frame = tk.Frame(self.master)
         # add code for dropdown below
+        self.data = dataset.Data()
         self.tkvar = tk.StringVar(self.master)
-        self.choices = [k for k in data.confirmed_dict.keys()]
+        self.choices = [k for k in self.data.confirmed_dict.keys()]
         self.choices.insert(0, "None")
         self.tkvar.set("US")
         self.popup_menu = tk.OptionMenu(self.master, self.tkvar, *self.choices)
@@ -37,20 +38,21 @@ class Win1:
             else:
                 tk.Label(self.master, text="please enter a valid country", fg='red').pack(side=tk.LEFT)
         else:
-            _class(self.new, number, self.tkvar)
+            _class(self.new, number, self.tkvar, self.data)
     def change_dropdown(self, *args):
         print(self.tkvar.get())
     def close_window(self):
         self.master.destroy()
 class Win2:
-    def __init__(self, master, number, country):
+    def __init__(self, master, number, country, data):
         self.master = master
         self.master.attributes('-fullscreen', True)
         self.frame = tk.Frame(self.master)
+        self.data = data
         c = str(country.get())
-        conf = data.confirmed_dict
-        dead = data.death_dict
-        rec = data.recover_dict
+        conf = self.data.confirmed_dict
+        dead = self.data.death_dict
+        rec = self.data.recover_dict
         x = range(len(conf[c]))
         y_conf = conf[c]
         y_dead = dead[c]
@@ -69,9 +71,9 @@ class Win2:
         dead_pred = 0
         try:
             # everything here deals with regression
-            conf_reg = regression.Exp(data, c, 0)
-            dead_reg = regression.Exp(data, c, 1)
-            rec_reg = regression.Exp(data, c, 2)
+            conf_reg = regression.Exp(self.data, c, 0)
+            dead_reg = regression.Exp(self.data, c, 1)
+            rec_reg = regression.Exp(self.data, c, 2)
             conf_reg.exp_reg()
             dead_reg.exp_reg()
             rec_reg.exp_reg()
@@ -118,6 +120,5 @@ class Win2:
 root = tk.Tk()
 root.title("Covid 19 Tracker")
 root.iconbitmap("img/coronavirus.ico")
-
 app = Win1(root)
 root.mainloop()
