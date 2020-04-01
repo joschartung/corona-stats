@@ -9,24 +9,25 @@ def transform_data(x,y):
     """
     x and y must be 1d numpy arrays
     """
-    x = x[:, np.newaxis]
-    y = y[:, np.newaxis]
+    x = np.array(x).reshape(-1,1)
+    y = np.array(y).reshape(-1,1)
     return x, y
 
-def poly_regression(x, y, d=2):
+def model_reg(x, y, d=2):
     """
     x and y must have been transformed using transform_data
     d must be an integer representing the degree of the polynomial
     returns a dictionary with the model, x_poly, y_poly_predicted, r2, rmse, and degree of the model
     """
     poly_features = PolynomialFeatures(degree=d)
-    x_poly = poly_features.fit_transform(x)
+    x_poly = poly_features.fit(x)
+    print(poly_features.get_feature_names())
     model = LinearRegression()
     model.fit(x_poly, y)
     y_poly_pred = model.predict(x_poly)
     rmse = np.sqrt(mean_squared_error(y,y_poly_pred))
     r2 = r2_score(y,y_poly_pred)
-    vals = {"model":model, "x_poly":x_poly,"y_poly_pred":y_poly_pred, "r2":r2, "rmse":rmse, "degree": d}
+    vals = {"model":model, "x_poly":x_poly,"y predicted":y_poly_pred, "r2":r2, "rmse":rmse, "degree": d}
     return vals
 
 def find_best(x,y):
@@ -38,16 +39,17 @@ def find_best(x,y):
     models = []
     best_index = 0
     for i in range(50):
-        results = poly_regression(x, y, i)
+        results = model_reg(x, y, i)
         new_r2 = results["r2"]
         if new_r2 > best_r2:
             best_r2 = new_r2
             best_degree = results["degree"]
             best_index = i
         models.append(results)
+        print("fin")
     return models[best_index]
 
-def nonlinear_regression(country, type):
+def poly_reg(country, type):
     """
     country is a string for any given country
     type is either confirmed, dead, or recovered
