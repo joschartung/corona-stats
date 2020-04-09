@@ -22,6 +22,7 @@ def main():
     with open("data/time_series_covid19_recovered_global.csv", 'wb') as f:
         f.write(rr.content)
     f.close()
+    print("finished")
 
 if __name__ == "__main__":
     main()

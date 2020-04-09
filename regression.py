@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 class Exp:
     """
@@ -22,6 +22,7 @@ class Exp:
         self.type = type
         self.types = ["confirmed", "deaths", "recovered"]
         self.get_data()
+        self.exp_reg()
     def get_data(self):
         """
         Gathers data from given dataset
@@ -117,7 +118,7 @@ class Poly:
         self.x = -1
         self.y = -1
         if self.type == 0:
-            self.x = np.array([i for i in range(len(self.data.confirmed_dict[self.country]))])
+            self.x = np.array(range(len(self.data.confirmed_dict[self.country])))
             self.y = np.array(self.data.confirmed_dict[self.country])
         elif self.type == 1:
             self.x = np.array([i for i in range(len(self.data.death_dict[self.country]))])
@@ -148,6 +149,44 @@ class Poly:
                 self.best_degrees.append(i)
         self.best_degree = self.best_degrees[-1]
         self.model_fit(self.best_degree)
+    def show(self):
+        plt.scatter(self.x, self.y)
+        plt.plot(self.x, self.y_pred)
+        plt.show()
+
+class Log:
+    def __init__(self, data, country, type):
+        self.data = data
+        self.country = country
+        self.type = type
+        self.types = ["confirmed", "dead", "recovered"]
+        self.get_data()
+        self.resize()
+        self.fit()
+    def get_data(self):
+        self.x = -1
+        self.y = -1
+        if self.type == 0:
+            self.x = np.array([i for i in range(len(self.data.confirmed_dict[self.country]))]).reshape(-1,1)
+            self.y = np.array(self.data.confirmed_dict[self.country]).reshape(-1,1)
+        elif self.type == 1:
+            self.x = np.array([i for i in range(len(self.data.death_dict[self.country]))]).reshape(-1,1)
+            self.y = np.array(self.data.death_dict[self.country]).reshape(-1,1)
+        elif self.type == 2:
+            self.x = np.array([i for i in range(len(self.data.recover_dict[self.country]))]).reshape(-1,1)
+            self.y = np.array(self.data.recover_dict[self.country]).reshape(-1,1)
+    def resize(self):
+        self.scaler = StandardScaler()
+        self.x_scaled = self.scaler.fit_transform(self.x)
+        self.y_scaled = self.scaler.transform(self.y)
+        self.x_scaled.reshape(-1,1)
+        self.y_scaled.reshape(-1,1)
+    def fit(self):
+        self.regr = LogisticRegression(max_iter=20000)
+        self.regr.fit(self.x,self.y)
+        self.y_pred = self.regr.predict(self.y_scaled)
+    def predict(self, input):
+        self.prediction = self.regr.predict(input.ravel())
     def show(self):
         plt.scatter(self.x, self.y)
         plt.plot(self.x, self.y_pred)

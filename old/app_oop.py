@@ -24,7 +24,7 @@ class Win1:
         self.tkvar.trace('w',self.change_dropdown)
         self.button = tk.Button(self.frame, text="Click here to view data", command = lambda: self.new_window("2",Win2))
         self.quitb = tk.Button(self.frame, text="Click here to quit", command = self.close_window).pack(side=tk.BOTTOM)
-        self.scrapebt = tk.Button(self.frame, text="Click here to update data", command = scrape.main).pack(side=tk.BOTTOM)
+        self.scrapebt = tk.Button(self.frame, text="Click here to update data", command = self.update).pack(side=tk.BOTTOM)
         self.button.pack(side=tk.RIGHT)
         self.svar = tk.StringVar(self.master)
         tk.Label(self.master,text="Enter a Country").pack(side=tk.TOP)
@@ -32,15 +32,19 @@ class Win1:
         self.frame.pack()
     def new_window(self, number, _class):
         self.new = tk.Toplevel(self.master)
+        print(self.svar.get())
         if self.tkvar.get() == "None":
             if self.svar.get().capitalize() in self.choices or self.svar.get().upper() in self.choices:
-                _class(self.new, number,self.svar)
+                _class(self.new, number,self.svar, self.data)
             else:
                 tk.Label(self.master, text="please enter a valid country", fg='red').pack(side=tk.LEFT)
         else:
             _class(self.new, number, self.tkvar, self.data)
     def change_dropdown(self, *args):
         print(self.tkvar.get())
+    def update(self):
+        scrape.main()
+        self.data = dataset.Data()
     def close_window(self):
         self.master.destroy()
 class Win2:
@@ -110,7 +114,6 @@ class Win2:
         self.retext = tk.Label(self.master, text="Recoveries: {}({:.2f}%) Prediction: {:.2f}".format(cur_rec, rec_conf_per, rec_pred)).pack(side=tk.BOTTOM)
         self.detext = tk.Label(self.master, text="Deaths: {}({:.2f}%) Prediction: {:.2f}".format(cur_dead, dead_conf_per, dead_pred)).pack(side=tk.BOTTOM)
         self.conftext = tk.Label(self.master, text="Confirmed Cases: {} Prediction: {:.2f}".format(cur_conf, conf_pred)).pack(side=tk.BOTTOM)
-
         self.quit = tk.Button(self.frame, text= "Quit this window", command = self.close_window).pack(side=tk.BOTTOM)
         self.sc.get_tk_widget().pack(side=tk.LEFT,fill=tk.BOTH)
         self.frame.pack()
