@@ -17,6 +17,7 @@ def test_poly():
 def test_log():
     data = d.Data()
     reg = regression.Log(data, "US", 0)
+    print(reg.pred(78))
     reg.show()
 
 test_log()

@@ -45,15 +45,15 @@ class Win1:
         # # Quit button:
         self.quit = tk.Button(self.master, text="Click here to quit", command=self.close_window)
         # update window:
-        self.pick.grid(row=0,column=2)
-        self.popup.grid(row=1,column=2)
-        self.enter.grid(row=2,column=2)
-        self.search.grid(row=3,column=2)
+        self.pick.grid(row=0,column=1)
+        self.popup.grid(row=1,column=1)
+        self.enter.grid(row=2,column=1)
+        self.search.grid(row=3,column=1)
         for i in range(len(self.ticks)):
             self.ticks[i].grid(row=4,column=2+i)
-        self.view_data.grid(row=5,column=2)
-        self.update_data.grid(row=6,column=2)
-        self.quit.grid(row=7,column=2)
+        self.view_data.grid(row=5,column=1)
+        self.update_data.grid(row=6,column=1)
+        self.quit.grid(row=7,column=1)
 
     def state(self):
         self.select = list(map((lambda var: var.get()), self.vars))
@@ -68,7 +68,7 @@ class Win1:
             else:
                 tk.Label(self.master, text="please enter a valid country", fg='red').pack(side=tk.LEFT)
         else:
-            if self.input.get() in self.choices():
+            if self.input[0].get() in self.choices():
                 _class(self.new, number, self.input, self.select)
             else:
                 tk.Label(self.master, text="please enter a valid country", fg='red').pack(side=tk.LEFT)
@@ -115,12 +115,11 @@ class Win2:
                 self.data_model.append(model)
             else:
                 self.data_model.append(0)
-
         self.predictions = []
         for k in range(len(self.data_model)): # k => 0, 1, 2
             if self.data_model[k]  != 0: # either Regression obj or 0
                 try:
-                    predicted = [self.data_model[k].predict(i) for i in self.X] # predicts the data for all given X
+                    predicted = self.data_model[k].y_pred # predicts the data for all given X
                 except:
                     predicted = [0]
                 self.predictions.append(predicted) # appends predicted data as a list to predictions
@@ -147,7 +146,7 @@ class Win2:
             if type(self.data_view[i]) != type(0): # if there is data at a given index
                 # show scatterplot
                 try: # plot predictions from data
-                    axs[self.track][0].plot(self.X, self.predictions[i],"k--", linewidth=1,alpha=0.75, label="r^2: {:.2f}".format(self.data_model[i].r2))
+                    axs[self.track][0].plot(self.X, self.predictions[i],"k--", linewidth=1,alpha=0.75, label="score: {:.2f}".format(self.data_model[i].score))
                 except:
                     print("could not plot predictions")
 
@@ -160,7 +159,8 @@ class Win2:
                     pred = 0 # ensures pred has a value, 0 by default
                     if type(self.cur_data[0]) != type(0): # checks if current data is requested
                         per = 100 *(self.cur_data[i] / self.cur_data[0])
-                    pred = self.data_model[i].predict(len(self.X)) # predicts data for tomorrow
+                        # print("per works")
+                    pred = self.data_model[i].pred(len(self.X)) # predicts data for tomorrow
                     self.pred_label = tk.Label(self.master, text=""+(self.y_labels[i] + ": {}({:.2f}%) Prediction: {:.2f}".format(self.cur_data[i], per, pred))).grid(row=1+i, column=0)
                 except:
                     print("could not label")
@@ -173,8 +173,9 @@ class Win2:
         self.quitb = tk.Button(self.master, text="Click here to Quit", command = self.close_window).grid(row=i+2, column=0)
     def close_window(self):
         self.master.destroy()
-root = tk.Tk()
-root.title("Coronavirus Data Tracker")
-root.iconbitmap("img/coronavirus.ico")
-win = Win1(root)
-root.mainloop()
+if __name__ == "__main__":
+    root = tk.Tk()
+    root.title("Coronavirus Data Tracker")
+    root.iconbitmap("img/coronavirus.ico")
+    win = Win1(root)
+    root.mainloop()
