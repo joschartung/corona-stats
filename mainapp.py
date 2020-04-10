@@ -9,7 +9,7 @@ import scrape
 class Win1:
     def __init__(self, master):
         self.master = master
-        self.master.geometry("500x500")
+        #self.master.geometry("500x500")
         self.frame = tk.Frame(self.master)
         self.data = dataset.Data()
         self.picks = ["Confirmed", "Deaths", "Recovered"]
@@ -45,15 +45,15 @@ class Win1:
         # # Quit button:
         self.quit = tk.Button(self.master, text="Click here to quit", command=self.close_window)
         # update window:
-        self.pick.grid(row=0,column=1)
-        self.popup.grid(row=1,column=1)
-        self.enter.grid(row=2,column=1)
-        self.search.grid(row=3,column=1)
+        self.pick.grid(row=0,column=3)
+        self.popup.grid(row=1,column=3)
+        self.enter.grid(row=2,column=3)
+        self.search.grid(row=3,column=3)
         for i in range(len(self.ticks)):
             self.ticks[i].grid(row=4,column=2+i)
-        self.view_data.grid(row=5,column=1)
-        self.update_data.grid(row=6,column=1)
-        self.quit.grid(row=7,column=1)
+        self.view_data.grid(row=5,column=3)
+        self.update_data.grid(row=6,column=3)
+        self.quit.grid(row=7,column=3)
 
     def state(self):
         self.select = list(map((lambda var: var.get()), self.vars))
@@ -63,15 +63,13 @@ class Win1:
         self.state()
         self.new = tk.Toplevel(self.master)
         if self.input.get() == "":
-            if self.tkvar.get() in self.choices:
-                _class(self.new, number, self.tkvar,self.select)
-            else:
-                tk.Label(self.master, text="please enter a valid country", fg='red').pack(side=tk.LEFT)
+            self.user_choice = self.tkvar.get()
         else:
-            if self.input[0].get() in self.choices():
-                _class(self.new, number, self.input, self.select)
-            else:
-                tk.Label(self.master, text="please enter a valid country", fg='red').pack(side=tk.LEFT)
+            self.user_choice = self.input.get()
+        if self.user_choice in self.choices:
+            _class(self.new, number, self.user_choice,self.select)
+        else:
+            tk.Label(self.master, text="please enter a valid country", fg='red').grid(row=8, column=0)
     def change_dropdown(self, *args):
         # prints new value of dropdown to console
         print(self.tkvar.get())
@@ -88,7 +86,7 @@ class Win2:
         self.master = master
         self.frame = tk.Frame(self.master)
         self.data = dataset.Data()
-        self.choice = country.get()
+        self.choice = country
         self.master.title("Data for "+ str(self.choice))
         self.view = view
         self.data_view = []
@@ -104,14 +102,14 @@ class Win2:
                 self.X = range(len(self.data.confirmed_dict[self.choice]))
             else:
                 self.data_view.append(0)
-
         self.data_model = []
-        for j in range(len(self.data_view)):
+        for j in range(len(self.data_view)): # j => 0, 1, 2
             if type(self.data_view[j]) != type(0):
                 try:
-                    model = regression.Exp(dataset.Data(), self.choice, j)
+                    model = regression.Poly(self.data, self.choice, j)
                 except:
                     model = 0
+                    print("no model made")
                 self.data_model.append(model)
             else:
                 self.data_model.append(0)
@@ -122,6 +120,7 @@ class Win2:
                     predicted = self.data_model[k].y_pred # predicts the data for all given X
                 except:
                     predicted = [0]
+                    print("no predictions made")
                 self.predictions.append(predicted) # appends predicted data as a list to predictions
             else:
                 self.predictions.append(0) # otherwise, append 0
@@ -159,7 +158,7 @@ class Win2:
                     pred = 0 # ensures pred has a value, 0 by default
                     if type(self.cur_data[0]) != type(0): # checks if current data is requested
                         per = 100 *(self.cur_data[i] / self.cur_data[0])
-                        # print("per works")
+
                     pred = self.data_model[i].pred(len(self.X)) # predicts data for tomorrow
                     self.pred_label = tk.Label(self.master, text=""+(self.y_labels[i] + ": {}({:.2f}%) Prediction: {:.2f}".format(self.cur_data[i], per, pred))).grid(row=1+i, column=0)
                 except:

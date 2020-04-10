@@ -114,6 +114,7 @@ class Poly:
         self.types = ["confirmed", "deaths", "recovered"]
         self.get_data()
         self.transform_data()
+        self.poly_reg()
     def get_data(self):
         self.x = -1
         self.y = -1
@@ -131,24 +132,28 @@ class Poly:
         self.y_change = np.array(self.y).reshape(-1, 1)
     def model_fit(self, d):
         self.poly_features = PolynomialFeatures(degree=d)
-        self.x_poly = self.poly_features.fit(self.x_change)
+        self.x_poly = self.poly_features.fit_transform(self.x_change)
         self.model = LinearRegression()
         self.model.fit(self.x_poly, self.y_change)
-        self.yp = self.model.predict(self.x_poly)
-        self.score = r2_score(self.y_change, self.yp)
-        self.rmse = np.sqrt(mean_squared_error(self.y_change, self.yp))
+        self.y_pred = self.model.predict(self.x_poly)
+        self.score = r2_score(self.y_change,self.y_pred)
+
     def poly_reg(self):
         best_r2 = 0
         best_d = 0
         self.best_degrees = []
         for i in range(50):
             self.model_fit(i)
-            if self.r2 > best_r2:
-                best_r2 = new_r2
+            if self.score > best_r2:
+                best_r2 = self.score
                 best_d = i
                 self.best_degrees.append(i)
         self.best_degree = self.best_degrees[-1]
         self.model_fit(self.best_degree)
+    def pred(self, val):
+        pred_val = self.poly_features.fit_transform(np.array(val).reshape(-1,1))
+        pred = self.model.predict(pred_val)
+        return pred[0][0]
     def show(self):
         plt.scatter(self.x, self.y)
         plt.plot(self.x, self.yp)
