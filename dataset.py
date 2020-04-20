@@ -5,6 +5,7 @@ class Data:
     def __init__(self):
         self.dataframe()
         self.parse_data()
+        print("dataset initialized")
     def dataframe(self):
         self.confirmed_df = pd.read_csv("data/time_series_covid19_confirmed_global.csv")
         self.deaths_df = pd.read_csv("data/time_series_covid19_deaths_global.csv")

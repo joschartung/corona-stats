@@ -20,4 +20,8 @@ def test_log():
     print(reg.pred(78))
     reg.show()
 
-test_log()
+def main():
+    test_exp()
+    test_log()
+    test_poly()
+    
